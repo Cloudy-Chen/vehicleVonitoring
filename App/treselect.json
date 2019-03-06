@@ -1,0 +1,78 @@
+[
+    {
+        "id":"A",
+        "name":"德州市新华汽车运输有限公司",
+        "sortNo":"A",
+        "parentId":"0",
+        "children": [
+            {
+                "id":"A01",
+                "name":"德州市鑫华汽车有限公司车队",
+                "sortNo":"A01",
+                "parentId":"A",
+                "children": [
+                    {
+                        "id":"A011",
+                        "name":"鲁NC7316",
+                        "sortNo":"A011",
+                        "parentId":"A01"
+                    },
+                    {
+                        "id":"A012",
+                        "name":"鲁NC5290",
+                        "sortNo":"A012",
+                        "parentId":"A01"
+                    },
+                    {
+                        "id":"A013",
+                        "name":"鲁NC1519",
+                        "sortNo":"A013",
+                        "parentId":"A01"
+                    },
+                    {
+                        "id":"A014",
+                        "name":"鲁NC3579",
+                        "sortNo":"A014",
+                        "parentId":"A01"
+                    },
+                    {
+                        "id":"A015",
+                        "name":"鲁NC9750",
+                        "sortNo":"A015",
+                        "parentId":"A01"
+                    },
+                    {
+                        "id":"A016",
+                        "name":"鲁NEA856",
+                        "sortNo":"A016",
+                        "parentId":"A01"
+                    },
+                    {
+                        "id":"A017",
+                        "name":"鲁NB2633",
+                        "sortNo":"A017",
+                        "parentId":"A01"
+                    }
+                ]
+            },
+
+            {
+                "id":"A02",
+                "name":"德州市鑫华汽车运输有限公司顺通车队",
+                "sortNo":"A02",
+                "parentId":"A",
+                "children": []
+            },
+
+            {
+                "id":"A03",
+                "name":"德州市鑫华汽车运输有限公司龙业车队",
+                "sortNo":"A03",
+                "parentId":"A",
+                "children": []
+            }
+
+        ]
+    },
+
+]
