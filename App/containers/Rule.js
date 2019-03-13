@@ -19,13 +19,12 @@ import {
     TextInput
 } from 'react-native';
 import {connect} from 'react-redux';
-import ScrollableTabView, { DefaultTabBar, } from 'react-native-scrollable-tab-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RuleSearch from '../components/Rule/RuleSearch'
 
 var {height, width} = Dimensions.get('window');
 
-class Notification extends Component {
+class Rule extends Component {
 
     constructor(props) {
         super(props);
@@ -51,7 +50,7 @@ class Notification extends Component {
     render() {
 
         return (
-            <View style={{flex:1,backgroundColor:'transparent'}}>
+            <View style={{flex:1,backgroundColor:'#eee'}}>
                 <View style={{height:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
                     <Text style={{color:'#fff',fontSize:20}}>交通违章（交警提供）</Text>
                 </View>
@@ -127,4 +126,4 @@ const mapStateToProps = (state, ownProps) => {
     return props
 }
 
-export default connect(mapStateToProps)(Notification);
+export default connect(mapStateToProps)(Rule);

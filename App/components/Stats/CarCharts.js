@@ -19,7 +19,6 @@ import {
 } from 'react-native';
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Toolbar,OPTION_SHOW,OPTION_NEVER,ACTION_ADD} from 'react-native-toolbar-wrapper'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import config from '../../../config'
 import { IndicatorViewPager,PagerTitleIndicator } from 'rn-viewpager'
@@ -27,6 +26,7 @@ import SpeedChart from './SpeedChart'
 import TiredChart from './TiredChart'
 import DistanceChart from './DistanceChart'
 import OilChart from './OilChart'
+import ToolBar from '../../utils/ToolBar'
 
 var {height, width} = Dimensions.get('window');
 
@@ -67,11 +67,8 @@ class CarCharts extends Component {
 
         return (
             <View style={{flex:1}}>
-                <Toolbar width={width}  title="统计分析" navigator={this.props.navigator} actions={[]}
-                         onPress={(i)=>{
-                             this.goBack()
-                         }}>
-
+                <ToolBar title={"统计分析"}
+                         onPress={()=>{this.goBack()}}/>
                     <View style={{flex:5,backgroundColor:'#eee'}}>
                         <Animated.View style={{opacity: this.state.fadeAnim,height:height-150,paddingBottom:5,}}>
                             <IndicatorViewPager
@@ -87,8 +84,6 @@ class CarCharts extends Component {
                             </IndicatorViewPager>
                         </Animated.View>
                     </View>
-
-                </Toolbar>
             </View>
         );
     }

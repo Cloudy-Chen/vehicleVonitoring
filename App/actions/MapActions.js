@@ -2,12 +2,6 @@ import _ from 'lodash'
 import Proxy from '../proxy/Proxy'
 import PreferenceStore from '../utils/PreferenceStore';
 import Config from '../../config';
-import {
-    UPDATE_PERSON_INFO,
-    ACCESS_TOKEN_ACK,
-    UPDATE_CERTIFICATE,
-    SET_AUTH_TRUE
-} from '../constants/UserConstants';
 
 //获取所有汽车信息
 export let getAllVehicle = () => {
@@ -32,7 +26,28 @@ export let getAllVehicle = () => {
     }
 }
 
+//获取所有汽车信息
+export let getCarsPosition = () => {
 
+    return (dispatch, getState) => {
+
+        return new Promise((resolve, reject) => {
+            var state=getState();
+            Proxy.postes({
+                url: Config.server + '/func/web/getCarsPosition',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: {
+                }
+            }).then((json)=>{
+                resolve(json)
+            }).catch((e)=>{
+                reject(e)
+            })
+        });
+    }
+}
 
 //验证通过
 export let setAuthTrue = () => {

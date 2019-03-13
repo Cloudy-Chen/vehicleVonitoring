@@ -19,14 +19,23 @@ import {
     TextInput
 } from 'react-native';
 import {connect} from 'react-redux';
-import ScrollableTabView, { DefaultTabBar, } from 'react-native-scrollable-tab-view';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Modalbox from 'react-native-modalbox';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import ServerPay from '../components/My/ServerPay';
+import ModifyMyInformation from '../components/My/ModifyMyInformation';
+import {
+    getAccessToken
+} from '../actions/UserActions';
+import {
+    PAGE_LOGIN,
+    PAGE_PLATFORM
+} from '../constants/PageStateConstants';
+import {
+    updatePageState
+} from '../actions/PageStateActions';
 
 var {height, width} = Dimensions.get('window');
 
-class Notification extends Component {
+class My extends Component {
 
     constructor(props) {
         super(props);
@@ -37,11 +46,41 @@ class Notification extends Component {
         }
     }
 
+    navigate2ServerPay() {
+        const { navigator } = this.props;
+        if (navigator) {
+            navigator.push({
+                name: 'ServerPay',
+                component: ServerPay,
+                params: {
+                }
+            })
+        }
+    }
+
+    navigate2ModifyMyInformation() {
+        const { navigator } = this.props;
+        if (navigator) {
+            navigator.push({
+                name: 'ModifyMyInformation',
+                component: ModifyMyInformation,
+                params: {
+                }
+            })
+        }
+    }
+
+    navigate2PlatformExchange(){
+        //TODO:dispatch a action
+        this.props.dispatch(updatePageState(
+            {state:PAGE_PLATFORM}))
+    }
+
     render() {
 
         return (
-            <View style={{flex:1,backgroundColor:'transparent'}}>
-<ScrollView style={{flex:1}}>
+            <View style={{flex:1,backgroundColor:'#eee'}}>
+            <ScrollView style={{flex:1}}>
                 <View style={{height:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
                     <Text style={{color:'#fff',fontSize:20}}>个人中心</Text>
                 </View>
@@ -49,20 +88,24 @@ class Notification extends Component {
                 <TouchableOpacity
                     style={{height:80,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:8,paddingLeft:10}}
                     onPress={()=>{
-
+                        this.navigate2ModifyMyInformation()
                     }}>
                     <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
-                        <Ionicons name={'md-person'} size={50} color={'#888'}/>
+                        <Image resizeMode="cover" source={require('../../img/person.png')} style={{height:50,width:50}}/>
                     </View>
                     <View style={{flex:5,backgroundColor:'#fff',justifyContent:'center',marginLeft:10,paddingLeft:20,flexDirection:'column'}}>
                         <Text>姓名：陈海云</Text>
                         <Text>电话：13305607453</Text>
                     </View>
+                    <View style={{flex:1,backgroundColor:'#fff',justifyContent:'center',alignItems:'flex-end',paddingRight:10}}>
+                        <Icon name={'angle-right'} size={25}/>
+                    </View>
                 </TouchableOpacity>
                 {/*服务费缴纳*/}
                 <TouchableOpacity style={{height:50,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:3,paddingLeft:10}}
-                                  onPress={()=>{
-                        }}>
+                       onPress={()=>{
+                       this.navigate2ServerPay()
+                       }}>
                     <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
                         <Icon name={'yen'} size={25} color={'#387ef5'}/>
                     </View>
@@ -146,6 +189,8 @@ class Notification extends Component {
     {/*切换平台*/}
     <TouchableOpacity style={{height:50,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:3,paddingLeft:10}}
                       onPress={()=>{
+                          this.props.dispatch(getAccessToken(false));
+                          this.navigate2PlatformExchange();
                         }}>
         <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
             <Icon name={'exchange'} size={25} color={'#387ef5'}/>
@@ -174,11 +219,11 @@ class Notification extends Component {
 
     <View style={{height:80,backgroundColor:'#eee',flexDirection:'row',padding:2,padding:10,justifyContent:'center',alignItems:'center'}}>
         <TouchableOpacity
-            style={{backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center',padding:5,paddingHorizontal:40}}
+            style={{backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center',padding:8,paddingHorizontal:40}}
             onPress={()=>{
 
             }}>
-            <Text style={{fontSize:18,color:'#fff'}}>退出登录</Text>
+            <Text style={{fontSize:16,color:'#fff'}}>退出登录</Text>
         </TouchableOpacity>
     </View>
 
@@ -208,4 +253,4 @@ const mapStateToProps = (state, ownProps) => {
     return props
 }
 
-export default connect(mapStateToProps)(Notification);
+export default connect(mapStateToProps)(My);

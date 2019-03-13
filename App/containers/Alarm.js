@@ -19,13 +19,13 @@ import {
     TextInput
 } from 'react-native';
 import {connect} from 'react-redux';
-import ScrollableTabView, { DefaultTabBar, } from 'react-native-scrollable-tab-view';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Modalbox from 'react-native-modalbox';
+import Communications from 'react-native-communications';
 
 var {height, width} = Dimensions.get('window');
 
-class Notification extends Component {
+class Alarm extends Component {
 
     constructor(props) {
         super(props);
@@ -34,12 +34,8 @@ class Notification extends Component {
             isRefreshing: false,
             fadeAnim: new Animated.Value(1),
 
-            notification:
-            [   {carNo:'鲁NA7813',type:'超速',time:'2018-03-08 12:58:30'},
-                {carNo:'鲁NA3356',type:'超速',time:'2018-03-09 14:55:55'},
-                {carNo:'鲁NA1530',type:'超速',time:'2018-03-10 08:23:00'},
-                {carNo:'鲁NA2336',type:'超速',time:'2018-03-11 23:00:01'}
-            ]
+            alarms:this.props.alarms,
+            content:'',
         }
     }
 
@@ -65,18 +61,20 @@ class Notification extends Component {
 
     render() {
 
-        var notification=this.state.notification;
-        var notificationList = null;
+        var alarms=this.props.alarms;
+        var alarmsList = null;
 
-        if(notification!=null && notification!=undefined && notification.length>0) {
+        if(alarms!=null && alarms!=undefined && alarms.length>0) {
             var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-            notificationList = (
+            alarmsList = (
                 <ListView
                     automaticallyAdjustContentInsets={false}
-                    dataSource={ds.cloneWithRows(notification)}
+                    dataSource={ds.cloneWithRows(alarms)}
                     renderRow={this.renderRow.bind(this)}
                 />
             );
+        }else{
+            alarmsList=(<View/>)
         }
 
         var messageInfo=
@@ -102,7 +100,10 @@ class Notification extends Component {
                     />
                 </View>
                 <View style={{height:50,width:width,marginBottom:5,justifyContent:'center',alignItems:'center'}}>
-                    <TouchableOpacity style={{width:200,height:45,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center',borderRadius:5}}>
+                    <TouchableOpacity style={{width:200,height:45,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center',borderRadius:5}}
+                    onPress={()=>{
+                                Communications.text('13305607453',this.state.content);
+                    }}>
                         <Text style={{fontSize:18,color:'#fff'}}>发送</Text>
                     </TouchableOpacity>
                 </View>
@@ -125,7 +126,7 @@ class Notification extends Component {
                         <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
                             <Text style={{fontSize:16,color:'#888'}}>操作</Text></View>
                     </View>
-                    {notificationList}
+                    {alarmsList}
                 </View>
 
                 {/*短信*/}
@@ -158,9 +159,10 @@ var styles = StyleSheet.create({
 const mapStateToProps = (state, ownProps) => {
 
     const props = {
+       alarms: state.alarm.alarms,
     }
 
     return props
 }
 
-export default connect(mapStateToProps)(Notification);
+export default connect(mapStateToProps)(Alarm);

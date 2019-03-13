@@ -19,15 +19,21 @@ import {
     TextInput
 } from 'react-native';
 import {connect} from 'react-redux';
-import ScrollableTabView, { DefaultTabBar, } from 'react-native-scrollable-tab-view';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Modalbox from 'react-native-modalbox';
 import {SearchBar} from 'react-native-elements'
-import {Toolbar,OPTION_SHOW,OPTION_NEVER,ACTION_ADD} from 'react-native-toolbar-wrapper'
+import ToolBar from '../../utils/ToolBar'
 
 var {height, width} = Dimensions.get('window');
 
 class RuleSearch extends Component {
+
+    goBack(){
+        const { navigator } = this.props;
+        if(navigator) {
+            navigator.pop();
+        }
+    }
 
     constructor(props) {
         super(props);
@@ -78,10 +84,10 @@ class RuleSearch extends Component {
         return (
             <View style={{flex:1,backgroundColor:'transparent'}}>
 
-                <Toolbar width={width}  title="违章查询" navigator={this.props.navigator} actions={[]}
-                         onPress={(i)=>{
-                             this.goBack()
-                         }}>
+                <ToolBar title={'违章查询'}
+                         onPress={()=>{
+                             this.goBack();
+                         }}/>
                     <SearchBar
                         lightTheme
                         onChangeText={
@@ -102,7 +108,6 @@ class RuleSearch extends Component {
                     </View>
                     {ruleList}
                 </View>
-                </Toolbar>
             </View>
         );
     }

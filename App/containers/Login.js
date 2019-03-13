@@ -9,7 +9,8 @@ import {
     Dimensions,
     TouchableOpacity,
     ActivityIndicator,
-    Modal
+    Modal,
+    ImageBackground
 } from 'react-native';
 import { connect } from 'react-redux';
 import Config from '../../config';
@@ -21,9 +22,7 @@ import {
     doLogin,
     setAuthTrue
 } from '../actions/UserActions';
-import Proxy from '../proxy/Proxy';
 import {
-    PAGE_LOGIN,
     PAGE_PLATFORM
 } from '../constants/PageStateConstants';
 import {
@@ -53,7 +52,7 @@ class Login extends Component {
     render() {
         return (
             <View style={[styles.container,{backgroundColor:'#eee',flexDirection:'column',justifyContent:'center',alignItems:'center'}]}>
-                <Image resizeMode="cover" source={require('../../img/bg.jpg')} style={{flex:1}}>
+                <ImageBackground source={require('../../img/bg.jpg')} style={{height:'100%',width:'100%'}}>
 
                 <View style={{backgroundColor:'transparent',flex:2,justifyContent:'center',alignItems:'center',}}>
                     <Text style={{fontSize:30,color:'#fff'}}>运营车辆动态管理系统</Text>
@@ -122,7 +121,7 @@ class Login extends Component {
                                                   this.setState({ isModalVisible: true })
                                                   this.props.dispatch(doLogin(this.state.username, this.state.password)).then((json) => {
                                                       if (json.re == 1)
-                                                          this.props.dispatch(setAuthTrue())
+                                                        this.props.dispatch(setAuthTrue())
                                                   })
                                               }
                                           }}>
@@ -181,7 +180,7 @@ class Login extends Component {
                         </View>
                     </TouchableOpacity>
                 </Modal>
-                </Image>
+                </ImageBackground>
             </View>
 
         )

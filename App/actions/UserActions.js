@@ -74,7 +74,7 @@ export let updatePersonInfo = (payload) => {
 }
 
 //获取口令
-let getAccessToken = (accessToken) => {
+export let getAccessToken = (accessToken) => {
     if (accessToken !== null)
         return {
             type: ACCESS_TOKEN_ACK,

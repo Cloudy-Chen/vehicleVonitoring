@@ -8,7 +8,7 @@ const initialState = {
     state:PAGE_PLATFORM,
     navigators:{
         Stats:null,
-        Notification:null,
+        Alarm:null,
         Rule:null,
         My:null,
     }

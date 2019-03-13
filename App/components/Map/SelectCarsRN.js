@@ -1,4 +1,3 @@
-
 import React, {Component} from 'react';
 import {
     Dimensions,
@@ -17,27 +16,33 @@ import {
     InteractionManager,
     ToolbarAndroid,
     Modal,
-    TextInput,
-    WebView
+    TextInput
 } from 'react-native';
-import Modalbox from 'react-native-modalbox';
-import Video from 'react-native-video';
-import YourEyes from '../components/Map/YourEyes'
-import VedioTest from '../components/Map/VedioTest'
-import CarCharts from '../components/Stats/CarCharts'
+import { MapView, MapTypes, Geolocation, Overlay } from 'react-native-baidu-map'
+import {connect} from 'react-redux';
 import SideMenu from 'react-native-side-menu';
 import TreeSelect from 'react-native-tree-select';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import treeselectData from '../treselect.json';
-import Proxy from '../proxy/Proxy'
-import Config from '../../config';
-import Communications from 'react-native-communications';
+import Modalbox from 'react-native-modalbox';
+import Video from 'react-native-video';
+import YourEyes from '../../components/Map/YourEyes'
+import VedioTest from '../../components/Map/VedioTest'
+import CarCharts from '../../components/Stats/CarCharts'
+import Icon from 'react-native-vector-icons/FontAwesome';
+import ToolBar from '../../utils/ToolBar'
 
+import icon_isOpen from '../../../img/car_isOpen.png'
+import icon_isClose from '../../../img/car_isClose.png'
+import icon_car from '../../../img/car.png'
+import icon_car_ios from '../../../img/car_ios_icon.png'
 
 var {height, width} = Dimensions.get('window');
 
+const color_isOpen = '#36AB60';
+const color_isClose = '#D81E06';
+const color_car = '#8A8A8A'
 
-class Map extends Component {
+class SelectCarsRN extends Component {
 
     goBack(){
         const { navigator } = this.props;
@@ -48,7 +53,7 @@ class Map extends Component {
 
     constructor(props) {
         super(props);
-        this.state={
+        this.state = {
             doingFetch: false,
             isRefreshing: false,
             fadeAnim: new Animated.Value(1),
@@ -69,9 +74,6 @@ class Map extends Component {
             videoUrl:'',
             paused:false,
 
-            //侧滑树状图
-            isOpen:false,
-
             //驾驶信息
             driverSpeed:0,
             driverName:'获取失败',
@@ -79,9 +81,8 @@ class Map extends Component {
             driverCompany:'获取失败',
             driverWeather:'获取失败',
             driverAddress:'获取失败',
+
         }
-        this.handleMessage = this.handleMessage.bind(this);
-        this.sendMessage = this.sendMessage.bind(this)
     }
 
     navigate2YourEyes() {
@@ -108,34 +109,16 @@ class Map extends Component {
         }
     }
 
-    handleMessage(e) {
-        //this.setState({ webViewData: e.nativeEvent.data });
-        var title = e.nativeEvent.data;
-        var cars = this.state.selectedLeafs;
-        var car_click = null;
+    render() {
 
-        cars.map((car)=>{
-            if(car.name==title)car_click = car;
-        })
+        var cars = this.props.selectedLeafs;
 
-        car_click==null?
-            this.setState({selectedVideo:-1,driverSpeed:0,driverName:'获取失败',driverLastTime:'获取失败',
-                driverCompany:'获取失败',driverWeather:'获取失败',driverAddress:'获取失败'})
-            :
-            this.setState({selectedVideo:-1,driverSpeed:car_click.driverSpeed,driverName:car_click.driverName,driverLastTime:car_click.driverLastTime,
-                driverCompany:car_click.driverCompany,driverWeather:car_click.driverWeather,driverAddress:car_click.driverAddress})
+        // if(this.state.currentPosition==null)
+        //     this.getCurrentPosition();
 
-        this.refs.modal1.open()
+        var markers = this.state.markers
+        var texts = this.state.texts
 
-    }
-
-    sendMessage(selectedLeafs) {
-        var json = JSON.stringify(selectedLeafs)
-        this.carWeb.postMessage(json);
-    }
-
-    render()
-    {
         var videoInfo =
             this.state.selectedVideo==-1?
                 <View style={{width:width,height:300,flexDirection:'column',backgroundColor:'#fff'}}>
@@ -144,7 +127,7 @@ class Map extends Component {
                             <TouchableOpacity
                                 style={{backgroundColor:'#36ab60',flexDirection:'column',flex:1,justifyContent:'center',alignItems:'center'}}
                                 onPress={()=>{this.setState({selectedVideo:1})}}>
-                                <Image resizeMode="contain" source={require('../../img/car_front.png')} style={{width:50,height:50}}/>
+                                <Image resizeMode="contain" source={require('../../../img/car_front.png')} style={{width:50,height:50}}/>
                                 <Text style={{fontSize:16,color:'#fff'}}>车前</Text>
                             </TouchableOpacity>
                         </View>
@@ -153,7 +136,7 @@ class Map extends Component {
                             <TouchableOpacity
                                 style={{backgroundColor:'#1296db',flexDirection:'column',flex:1,justifyContent:'center',alignItems:'center'}}
                                 onPress={()=>{this.setState({selectedVideo:2})}}>
-                                <Image resizeMode="contain" source={require('../../img/car_driver.png')} style={{width:50,height:50}}/>
+                                <Image resizeMode="contain" source={require('../../../img/car_driver.png')} style={{width:50,height:50}}/>
                                 <Text style={{fontSize:16,color:'#fff'}}>司机</Text>
                             </TouchableOpacity>
                         </View>
@@ -163,7 +146,7 @@ class Map extends Component {
                         <View style={{flex:1,padding:10,}}>
                             <TouchableOpacity style={{backgroundColor:'#d81e06',flexDirection:'column',flex:1,justifyContent:'center',alignItems:'center'}}
                                               onPress={()=>{this.setState({selectedVideo:3})}}>
-                                <Image resizeMode="contain" source={require('../../img/car_tunnel.png')} style={{width:50,height:50}}/>
+                                <Image resizeMode="contain" source={require('../../../img/car_tunnel.png')} style={{width:50,height:50}}/>
                                 <Text style={{fontSize:16,color:'#fff'}}>通道</Text>
                             </TouchableOpacity>
                         </View>
@@ -171,7 +154,7 @@ class Map extends Component {
                         <View style={{flex:1,padding:10,}}>
                             <TouchableOpacity style={{backgroundColor:'#88147f',flexDirection:'column',flex:1,justifyContent:'center',alignItems:'center'}}
                                               onPress={()=>{this.setState({selectedVideo:4})}}>
-                                <Image resizeMode="contain" source={require('../../img/car_back.png')} style={{width:50,height:50}}/>
+                                <Image resizeMode="contain" source={require('../../../img/car_back.png')} style={{width:50,height:50}}/>
                                 <Text style={{fontSize:16,color:'#fff'}}>车后</Text>
                             </TouchableOpacity>
                         </View>
@@ -194,21 +177,21 @@ class Map extends Component {
                         style={{width:width,height:270}}
                         onPress={() => this.setState({ paused: !this.state.paused })}
                     >
-                        <Video source={ {uri:"https://media.w3.org/2010/05/sintel/trailer.mp4"}} // Looks for .mp4 file (background.mp4) in the given expansion version.
-                               ref={(ref) => {this.player = ref}}
-                               rate={1.0}                   // 0 is paused, 1 is normal.
-                               volume={1.0}                 // 0 is muted, 1 is normal.
-                               muted={false}                // Mutes the audio entirely.
-                               paused={this.state.paused}               // Pauses playback entirely.
-                               resizeMode="contain"           // Fill the whole screen at aspect ratio.
-                               repeat={true}                // Repeat forever.
-                               onLoad={(data)=>{
+                    <Video source={ {uri:"https://media.w3.org/2010/05/sintel/trailer.mp4"}} // Looks for .mp4 file (background.mp4) in the given expansion version.
+                           ref={(ref) => {this.player = ref}}
+                           rate={1.0}                   // 0 is paused, 1 is normal.
+                           volume={1.0}                 // 0 is muted, 1 is normal.
+                           muted={false}                // Mutes the audio entirely.
+                           paused={this.state.paused}               // Pauses playback entirely.
+                           resizeMode="contain"           // Fill the whole screen at aspect ratio.
+                           repeat={true}                // Repeat forever.
+                           onLoad={(data)=>{
                                this.state.duration=data.duration
                            }}
-                               onEnd={()=>{this.setState({paused: true});
+                           onEnd={()=>{this.setState({paused: true});
                                        this.player.seek(0)}}
-                               style={{width:width,height:300,alignItems:'center',justifyContent:'center'}} >
-                        </Video>
+                           style={{width:width,height:300,alignItems:'center',justifyContent:'center'}} >
+                    </Video>
                     </TouchableOpacity>
                 </View>
 
@@ -216,7 +199,7 @@ class Map extends Component {
             <View style={{flex:1,flexDirection:'column',justifyContent:'center',alignItems:'flex-start',padding:10,paddingTop:3}}>
 
                 <View style={{height:30,width:width,marginBottom:5,justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderColor:'#aaa'}}>
-                    <Text style={{fontSize:16}}>鲁NC7316</Text>
+                        <Text style={{fontSize:16}}>鲁NC7316</Text>
                 </View>
 
                 <View style={{height:220,marginBottom:5,padding:10}}>
@@ -235,10 +218,8 @@ class Map extends Component {
                     />
                 </View>
                 <View style={{height:50,width:width,marginBottom:5,justifyContent:'center',alignItems:'center'}}>
-                    <TouchableOpacity style={{width:200,height:45,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center',borderRadius:5}}
-                                      onPress={()=>{Communications.text('13305607453',this.state.content);}}
-                    >
-                        <Text style={{fontSize:18,color:'#fff'}}>发送</Text>
+                    <TouchableOpacity style={{width:200,height:45,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center',borderRadius:5}}>
+                    <Text style={{fontSize:18,color:'#fff'}}>发送</Text>
                     </TouchableOpacity>
                 </View>
             </View>;
@@ -250,21 +231,21 @@ class Map extends Component {
                     <View style={{flex:1,flexDirection:'row',marginLeft:10}}><Text style={{color:'#000',flex:1}}>驾驶员</Text><Text style={{color:'#888',flex:1,textAlign:'right'}}>{this.state.driverName}</Text></View>
                 </View>
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
-                    <Text style={{color:'#000',flex:1}}>最后更新时间</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverLastTime}</Text></View>
+                <Text style={{color:'#000',flex:1}}>最后更新时间</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverLastTime}</Text></View>
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
-                    <Text style={{color:'#000',flex:1}}>所属公司</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverCompany}</Text></View>
+                <Text style={{color:'#000',flex:1}}>所属公司</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverCompany}</Text></View>
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
-                    <Text style={{color:'#000',flex:1}}>天气状况</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverWeather}</Text></View>
+                <Text style={{color:'#000',flex:1}}>天气状况</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverWeather}</Text></View>
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
-                    <Text style={{color:'#000',flex:1}}>地址</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverAddress}</Text></View>
+                <Text style={{color:'#000',flex:1}}>地址</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverAddress}</Text></View>
                 <View style={{flex:2,flexDirection:'row',justifyContent:'center',alignItems:'center',marginTop:10}}>
                     <TouchableOpacity style={{flex:1,flexDirection:'column',justifyContent:'center',alignItems:'center'}}
-                                      onPress={()=>{
+                    onPress={()=>{
                         this.refs.modal1.close();
                         this.navigate2YourEyes();
                         //YourEyesModule.showYourEyesOfCar('1');
                     }}>
-                        <Image resizeMode="contain" source={require('../../img/route.png')} style={{width:40,height:40}}/>
+                        <Image resizeMode="contain" source={require('../../../img/route.png')} style={{width:40,height:40}}/>
                         <Text style={{marginTop:10,color:'#888'}}>
                             轨迹回放
                         </Text>
@@ -276,7 +257,7 @@ class Map extends Component {
                                           this.refs.modal2.open();
                                           //this.navigate2VedioTest()
                                       }}>
-                        <Image resizeMode="contain" source={require('../../img/vonitoring.png')} style={{width:40,height:40}}/>
+                        <Image resizeMode="contain" source={require('../../../img/vonitoring.png')} style={{width:40,height:40}}/>
                         <Text style={{marginTop:10,color:'#888'}}>
                             视频监控
                         </Text>
@@ -287,7 +268,7 @@ class Map extends Component {
                                           this.refs.modal1.close();
                                           this.refs.modal3.open();
                                       }}>
-                        <Image resizeMode="contain" source={require('../../img/message.png')} style={{width:40,height:40}}/>
+                        <Image resizeMode="contain" source={require('../../../img/message.png')} style={{width:40,height:40}}/>
                         <Text style={{marginTop:10,color:'#888'}}>
                             短信
                         </Text>
@@ -298,7 +279,7 @@ class Map extends Component {
                                           this.refs.modal1.close();
                                           this.navigate2CarCharts();
                                       }}>
-                        <Image resizeMode="contain" source={require('../../img/stats.png')} style={{width:40,height:40}}/>
+                        <Image resizeMode="contain" source={require('../../../img/stats.png')} style={{width:40,height:40}}/>
                         <Text style={{marginTop:10,color:'#888'}}>
                             统计
                         </Text>
@@ -307,65 +288,62 @@ class Map extends Component {
                 </View>
             </View>;
 
-        const menu =
-            <View style={{backgroundColor:'#fff',flex:1,paddingTop:10}}>
-                <TreeSelect
-                    data={treeselectData}
-                    openIds={['A01']}
-                    isShowTreeId={false}
-                    itemStyle={{
-                    fontSize: 14,
-                    }}
-                    selectedItemStyle={{
-                    fontSize: 14,
-                    }}
-                    treeNodeStyle={{
-                    }}
-                    onPress={(selectedLeafs)=>{
-                        this.setState({isOpen:false,selectedLeafs:selectedLeafs})
-                        this.sendMessage(selectedLeafs)
-                    }
-                    }
-                />
-            </View>;
-
         return (
-            <SideMenu
-                menu={menu}                    //抽屉内的组件
-                isOpen={this.state.isOpen}     //抽屉打开/关闭
-                openMenuOffset={width*2 / 3}     //抽屉的宽度
-                hiddenMenuOffset={0}          //抽屉关闭状态时,显示多少宽度 默认0 抽屉完全隐藏
-                edgeHitWidth={40}              //距离屏幕多少距离可以滑出抽屉,默认60
-                disableGestures={false}        //是否禁用手势滑动抽屉 默认false 允许手势滑动
-                menuPosition={'left'}     //抽屉在左侧还是右侧
-                autoClosing={true}       //默认为true 如果为true 一有事件发生抽屉就会关闭
-            >
-            <View style={styles.container}>
 
-                <TouchableOpacity
-                    style={{height:56,backgroundColor:'#387ef5',justifyContent:'flex-start',alignItems:'center',padding:10,flexDirection:'row'}}
-                    onPress={()=>{
-                    this.setState({isOpen:true})
-                }}>
-                    <Ionicons name={'md-search'} size={30} color="#fff"/>
-                    <Text style={{fontSize:20,color:'#fff',marginLeft:5}}>选车</Text>
-                </TouchableOpacity>
+            <View style={{flex:1}}>
+                <ToolBar title={'地图监控'}
+                         onPress={()=>{this.goBack()}}/>
+                <MapView
+                    zoomControlsVisible={true}
+                    width={width}
+                    height={height-140}
+                    zoom={this.state.zoom}
+                    trafficEnabled={true}
+                    mapType={MapTypes.NORMAL}
+                    center={this.state.center}
+                    onMarkerClick={(marker)=>{
+                            //this.setState({carInfoVisible:true})
+                            var title = marker.title;
+                            var car_click = null;
+                            cars.map((car)=>{
+                                if(car.name==title)car_click = car;
+                            })
 
-                    <WebView
-                        ref={carWeb =>
-                            this.carWeb = carWeb}
-                        style={{marginBottom:15}}
-                        automaticallyAdjustContentInsets={true}
-                        //source={require('../Html/inverse_address.html')}     //网页数据源
-                        source={Platform.OS=='ios'?require('../components/Html/carselect_html.html'):{uri:'file:///android_asset/carselect_html.html'}}     //网页数据源
-                        javaScriptEnabled={true}
-                        domStorageEnabled={true}
-                        startInLoadingState={true}
-                        //接收HTML发出的数据
-                        onMessage={this.handleMessage}
-                        injectedJavaScript={patchPostMessageJsCode}
+                            car_click==null?
+                            this.setState({selectedVideo:-1,driverSpeed:0,driverName:'获取失败',driverLastTime:'获取失败',
+                            driverCompany:'获取失败',driverWeather:'获取失败',driverAddress:'获取失败'})
+                            :
+                            this.setState({selectedVideo:-1,driverSpeed:car_click.driverSpeed,driverName:car_click.driverName,driverLastTime:car_click.driverLastTime,
+                            driverCompany:car_click.driverCompany,driverWeather:car_click.driverWeather,driverAddress:car_click.driverAddress})
 
-                    />
+                            this.refs.modal1.open()
+                        }}
+                >
+                    {
+                        markers!=null&&markers.length>0?
+                            markers.map(marker => (
+                                <Overlay.Marker
+                                    title={marker.title}
+                                    location={marker.location}
+                                    icon={icon_car_ios}
+                                    rotate={marker.rotate}
+                                />
+                            )):null
+                    }
+                    {
+                        texts != null && texts.length > 0 ?
+                            texts.map(text => (
+                                <Overlay.Text
+                                    location={text.location}
+                                    text={text.text}
+                                    fontSize={40}
+                                    fontColor={text.fontColor}
+                                    bgColor={'#FFFFFF'}
+                                    rotate={text.rotate}
+                                />
+                            )) : null
+                    }
+                </MapView>
 
                 {/*汽车信息*/}
                 <Modalbox
@@ -399,51 +377,133 @@ class Map extends Component {
                     {messageInfo}
                 </Modalbox>
             </View>
-            </SideMenu>
-        )
+        );
     }
 
-    componentDidMount(){
+    componentDidMount() {
 
-        // Proxy.postes({
-        //     url: Config.server + '/web/getCarsPosition',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: {
-        //     }
-        // }).then((json)=>{
-        //
-        // }).catch((e)=>{
-        // })
-
+        var selectedLeafs = this.props.selectedLeafs;
+        this.showSelectedCarsOnMap(selectedLeafs);
     }
 
+    getCurrentPosition(){
+        Geolocation.getCurrentPosition().then(
+            (data) => {
+                this.setState({
+                    zoom: 18,
+                    center: {
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                    },
+                    markers:[{
+                        location: {
+                            latitude: data.latitude,
+                            longitude: data.longitude,
+                        },
+                    }],
+                    texts:[{
+                        location: {
+                            latitude: data.latitude,
+                            longitude: data.longitude,
+                        },
+                        text:'我的位置',
+                        fontColor:'#8A8A8A'
+                    }],
+                    currentPosition:{
+                        location: {
+                            latitude: data.latitude,
+                            longitude: data.longitude,
+                        },}
+                })
+            }
+        ).catch(error => {
+            console.warn(error, 'error')
+        })
+    }
+
+    showSelectedCarsOnMap(selectedLeafs){
+        //在地图上显示选中的车
+        //自适配移动到中心点（原生？）
+
+        var cars = selectedLeafs;
+        var markers = [];
+        var texts = [];
+        var center = null;//中心点暂时取某个车位置
+
+        cars.map((car,i)=>{
+
+            var icon = null;
+            var color = null;
+
+            switch (car.flag){
+                //1表示开始2表示关闭3表示未启动
+                case 1:icon = icon_isOpen;color=color_isOpen;break;
+                case 2:icon = icon_isClose;color=color_isClose;break;
+                case 0:icon = icon_car;color=color_car;break;
+            }
+
+            var marker =
+                {
+                    title:car.name,
+                    location: {
+                        latitude: car.latitude,
+                        longitude: car.longitude,
+                    },
+                    rotate: car.rotate,
+                    icon:icon,
+                }
+            var text =
+                {
+                    text:car.name,
+                    location: {
+                        latitude: car.latitude,
+                        longitude: car.longitude,
+                    },
+                    rotate:car.rotate,
+                    fontColor:color,
+                }
+
+            markers.push(marker)
+            texts.push(text)
+            center = {
+                latitude: car.latitude,
+                longitude: car.longitude,
+            }
+        })
+
+        this.setState({markers:markers,texts:texts,zoom:10,center:center})
+
+    }
 }
 
-const patchPostMessageFunction = function() {
-    var originalPostMessage = window.postMessage;
-
-    var patchedPostMessage = function(message, targetOrigin, transfer) {
-        originalPostMessage(message, targetOrigin, transfer);
-    };
-
-    patchedPostMessage.toString = function() {
-        return String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage');
-    };
-
-    window.postMessage = patchedPostMessage;
-};
-
-const patchPostMessageJsCode = '(' + String(patchPostMessageFunction) + ')();';
-
-const styles = StyleSheet.create({
+var styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor:'#fff'
     },
-
+    toolbar: {
+        backgroundColor: '#eee',
+        height: 56,
+    },
+    modalContainer:{
+        flex:1,
+        justifyContent: 'center',
+    },
+    modalBackgroundStyle:{
+        backgroundColor:'rgba(0,0,0,0.3)'
+    },
+    loader: {
+        marginTop: 10
+    },
 });
 
-export default  Map
+const mapStateToProps = (state, ownProps) => {
+
+    const props = {
+        courses:state.user.courses,
+    }
+
+    return props
+}
+
+export default connect(mapStateToProps)(SelectCarsRN);

@@ -11,7 +11,8 @@ import {
     Dimensions,
     TouchableOpacity,
     ActivityIndicator,
-    Modal
+    Modal,
+    ImageBackground,
 } from 'react-native';
 import { connect } from 'react-redux';
 import Config from '../../config';
@@ -54,7 +55,7 @@ class PlatformExchange extends Component {
 
         return (
             <View style={[styles.container,{backgroundColor:'#eee',flexDirection:'column',justifyContent:'center',alignItems:'center'}]}>
-                <Image resizeMode="cover" source={require('../../img/bg.jpg')} style={{flex:1}}>
+                <ImageBackground source={require('../../img/bg.jpg')} style={{width:'100%',height:'100%'}}>
 
                 <View style={{backgroundColor:'transparent',flex:2,justifyContent:'center',alignItems:'center',}}>
                     <Text style={{fontSize:30,color:'#fff'}}>运营车辆动态管理系统</Text>
@@ -136,7 +137,7 @@ class PlatformExchange extends Component {
                             山东航天九通车联网有限公司
                         </Text>
                     </View>
-                </Image>
+                </ImageBackground>
             </View>
 
         )

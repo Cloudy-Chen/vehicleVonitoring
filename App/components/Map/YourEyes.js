@@ -16,8 +16,8 @@ import {
     InteractionManager,
     WebView
 } from 'react-native';
-import {Toolbar,OPTION_SHOW,OPTION_NEVER} from 'react-native-toolbar-wrapper';
 var {height, width} = Dimensions.get('window');
+import ToolBar from '../../utils/ToolBar'
 
 class YourEyes extends Component {
 
@@ -31,7 +31,6 @@ class YourEyes extends Component {
     constructor(props) {
         super(props);
         this.state={
-            detailHtml:'http://lbsyun.baidu.com/trace/admin/manager?service_id=209740'
         }
     }
 
@@ -39,18 +38,18 @@ class YourEyes extends Component {
     {
         return (
             <View style={styles.container}>
-                <Toolbar width={width}  title="轨迹回放" navigator={this.props.navigator} actions={[]}
-                         onPress={(i)=>{
+                <ToolBar title={'轨迹回放'}
+                         onPress={()=>{
                              this.goBack()
-                         }}>
+                         }}/>
                     <WebView
+                        style={{marginBottom:15}}
                         automaticallyAdjustContentInsets={true}
-                        source={{uri: this.state.detailHtml}}     //网页数据源
+                        source={require('../Html/trajectory.html')}     //网页数据源
                         javaScriptEnabled={true}
                         domStorageEnabled={true}
                         startInLoadingState={true}
                     />
-                </Toolbar>
             </View>
         )
     }
