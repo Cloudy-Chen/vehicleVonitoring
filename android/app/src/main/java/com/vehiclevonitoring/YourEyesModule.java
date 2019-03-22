@@ -10,7 +10,6 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.vehiclevonitoring.track.TrackQueryActivity;
 
 public class YourEyesModule extends ReactContextBaseJavaModule {
 
@@ -43,7 +42,7 @@ public class YourEyesModule extends ReactContextBaseJavaModule {
     public void showYourEyesOfCar(String CarNo){
 
         Intent intent=new Intent();
-        intent.setClass(getCurrentActivity(), TrackQueryActivity.class);
+        intent.setClass(getCurrentActivity(), YourEyesActivity.class);
 
         intent.putExtra("CarNo", CarNo);
 

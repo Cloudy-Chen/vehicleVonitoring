@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,12 +13,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.facebook.react.ReactActivity;
-import com.vehiclevonitoring.track.utils.BitmapUtil;
 
 public class MainActivity extends ReactActivity {
 
     private static final int MY_PERMISSION_REQUEST_CODE=10000;
-    private MainApplication trackApp;
+
     /**
      * Returns the name of the main component registered from JavaScript.
      * This is used to schedule rendering of the component.
@@ -28,52 +26,30 @@ public class MainActivity extends ReactActivity {
     protected String getMainComponentName() {
         return "vehicleVonitoring";
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MyActivityManager.addActivity(this);//加一个Activity
-        trackApp = (MainApplication) getApplicationContext();
-        BitmapUtil.init();
+
         requestGranted();
     }
-
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         MyActivityManager.removeActivity(this);//移除一个Activity
-        if (trackApp.trackConf.contains("is_trace_started")
-                && trackApp.trackConf.getBoolean("is_trace_started", true)) {
-            // 退出app停止轨迹服务时，不再接收回调，将OnTraceListener置空
-            trackApp.mClient.setOnTraceListener(null);
-            trackApp.mClient.stopTrace(trackApp.mTrace, null);
-        } else {
-            trackApp.mClient.clear();
-        }
-        trackApp.isTraceStarted = false;
-        trackApp.isGatherStarted = false;
-        SharedPreferences.Editor editor = trackApp.trackConf.edit();
-        editor.remove("is_trace_started");
-        editor.remove("is_gather_started");
-        editor.apply();
-
-        BitmapUtil.clear();
     }
 
     private void requestGranted(){
         boolean isAllGranted = checkPermissionAllGranted(
                 new String[] {
-
                         Manifest.permission.CAMERA,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.READ_PHONE_STATE,
-
-
+                        Manifest.permission.SEND_SMS
                 }
         );
         // 如果这3个权限全都拥有, 则直接执行备份代码
@@ -97,6 +73,7 @@ public class MainActivity extends ReactActivity {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.SEND_SMS
                 },
                 MY_PERMISSION_REQUEST_CODE
         );
@@ -158,4 +135,3 @@ public class MainActivity extends ReactActivity {
     }
 
 }
-
