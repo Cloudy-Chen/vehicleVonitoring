@@ -123,6 +123,7 @@ class Login extends Component {
                                                       if (json.re == 1)
                                                         this.props.dispatch(setAuthTrue())
                                                   })
+                                                  //this.props.dispatch(setAuthTrue())
                                               }
                                           }}>
                                 <View style={{flex:1,flexDirection:'column',alignItems:'center',justifyContent:'flex-start'}}>

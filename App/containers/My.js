@@ -81,7 +81,7 @@ class My extends Component {
         return (
             <View style={{flex:1,backgroundColor:'#eee'}}>
             <ScrollView style={{flex:1}}>
-                <View style={{height:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
+                <View style={{height:Platform.OS=='ios'?78:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
                     <Text style={{color:'#fff',fontSize:20}}>个人中心</Text>
                 </View>
 

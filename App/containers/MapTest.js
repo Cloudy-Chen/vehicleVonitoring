@@ -37,8 +37,9 @@ import CapturePicture from '../components/Map/CapturePicture'
 
 var {height, width} = Dimensions.get('window');
 
+var ws = new WebSocket('ws://202.194.14.71:10001/LocationMsg');
 
-class Map extends Component {
+class MapTest extends Component {
 
     goBack(){
         const { navigator } = this.props;
@@ -125,20 +126,23 @@ class Map extends Component {
 
     handleMessage(e) {
         //this.setState({ webViewData: e.nativeEvent.data });
-        var title = e.nativeEvent.data;
+
+        var msgJson = e.nativeEvent.data;
+        var msg = JSON.parse(msgJson)
+        var plateNum = msg.plateNum
         var cars = this.state.selectedLeafs;
         var car_click = null;
 
         cars.map((car)=>{
-            if(car.plateNum==title)car_click = car;
+            if(car.plateNum==plateNum)car_click = car;
         })
 
         car_click==null?
-            this.setState({isOpen:false,selectedVideo:-1,driverSpeed:0,driverName:'获取失败',driverLastTime:'获取失败',
+            this.setState({selectedVideo:-1,driverSpeed:0,driverName:'获取失败',driverLastTime:'获取失败',
                 driverCompany:'获取失败',driverWeather:'获取失败',driverAddress:'获取失败',driverFlag:0})
             :
-            this.setState({isOpen:false,selectedVideo:-1,driverSpeed:car_click.driverSpeed,driverName:car_click.driverName,driverLastTime:car_click.driverLastTime,
-                driverCompany:car_click.driverCompany,driverWeather:car_click.driverWeather,driverAddress:car_click.driverAddress,driverFlag:car_click.driverFlag})
+            this.setState({selectedVideo:-1,driverSpeed:car_click.driverSpeed,driverName:car_click.driverName,driverLastTime:car_click.driverLastTime,
+                driverCompany:car_click.driverCompany,driverWeather:msg.weather,driverAddress:msg.address,driverFlag:car_click.driverFlag})
 
         this.refs.modal1.open()
 
@@ -151,6 +155,46 @@ class Map extends Component {
 
     render()
     {
+        if(ws!=null) {
+            ws.onopen = () => {
+                console.log("ws.open");
+            }
+
+            ws.onmessage = (e) => {
+                console.log(e.data);
+                var wsDataJson = e.data;
+                var wsData = JSON.parse(wsDataJson);
+                //目前只收到一个数据
+                var car = {
+                    id:'A001',
+                    name:'鲁NC7316',
+                    plateNum: '鲁NC7316',
+                    sortNo:"A011",
+                    parentId:"A01",
+                    latitude: wsData.latitude,
+                    longitude: wsData.longitude,
+                    rotate:90,
+                    driverFlag:1,
+                    driverSpeed: wsData.speed,
+                    driverName: '陈海云',
+                    driverLastTime: wsData.time,
+                    driverCompany: '山东大学',
+                    driverWeather: '晴天',
+                    driverAddress: '山东省济南市历城区',
+
+                }
+                var selectedLeafs = [];
+                selectedLeafs.push(car);
+                this.setState({selectedLeafs: selectedLeafs})
+                this.sendMessage(selectedLeafs)
+            }
+
+            ws.onerror = (e) => {
+                console.log(e);
+                alert(e.message);
+            }
+        }
+
         var driverFlagIcon = <Ionicons name={'md-radio-button-on'} color={'#8a8a8a'} size={20}/>
         var driverFlagName = <Text style={{color:'#8a8a8a',flex:1,textAlign:'left-center',marginLeft:10,fontSize:14}}>离线</Text>
 
@@ -297,7 +341,7 @@ class Map extends Component {
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
                     <Text style={{color:'#000',flex:1}}>天气状况</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverWeather}</Text></View>
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
-                    <Text style={{color:'#000',flex:1}}>地址</Text><Text style={{color:'#888',flex:5,textAlign:'right'}}>{this.state.driverAddress}</Text></View>
+                    <Text style={{color:'#000',flex:1}}>地址</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverAddress}</Text></View>
                 <View style={{flex:2,flexDirection:'row',justifyContent:'center',alignItems:'center',marginTop:10}}>
                     <TouchableOpacity style={{flex:1,flexDirection:'column',justifyContent:'center',alignItems:'center'}}
                                       onPress={()=>{
@@ -374,8 +418,10 @@ class Map extends Component {
                     treeNodeStyle={{
                     }}
                     onPress={(selectedLeafs)=>{
-                        this.setState({isOpen:false,selectedLeafs:selectedLeafs})
-                        this.sendMessage(selectedLeafs)
+                        //this.setState({isOpen:false,selectedLeafs:selectedLeafs})
+                        //this.sendMessage(selectedLeafs)
+                        this.setState({isOpen:false})
+                        //ws = new WebSocket('ws://202.194.14.71:10001/LocationMsg');
                     }
                     }
                 />
@@ -498,4 +544,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default  Map
+export default  MapTest

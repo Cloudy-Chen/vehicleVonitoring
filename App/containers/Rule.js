@@ -21,6 +21,8 @@ import {
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RuleSearch from '../components/Rule/RuleSearch'
+import RuleAdd from '../components/Rule/RuleAdd'
+import RuleAddSearch from '../components/Rule/RuleAddSearch'
 
 var {height, width} = Dimensions.get('window');
 
@@ -47,11 +49,35 @@ class Rule extends Component {
         }
     }
 
+    navigate2RuleAdd() {
+        const { navigator } = this.props;
+        if (navigator) {
+            navigator.push({
+                name: 'RuleAdd',
+                component: RuleAdd,
+                params: {
+                }
+            })
+        }
+    }
+
+    navigate2RuleAddSearch() {
+        const { navigator } = this.props;
+        if (navigator) {
+            navigator.push({
+                name: 'RuleAddSearch',
+                component: RuleAddSearch,
+                params: {
+                }
+            })
+        }
+    }
+
     render() {
 
         return (
             <View style={{flex:1,backgroundColor:'#eee'}}>
-                <View style={{height:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
+                <View style={{height:Platform.OS=='ios'?78:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
                     <Text style={{color:'#fff',fontSize:20}}>交通违章（交警提供）</Text>
                 </View>
 
@@ -73,7 +99,7 @@ class Rule extends Component {
                 {/*关注车辆的添加（可平台外车辆）*/}
                 <TouchableOpacity style={{height:50,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:3,paddingLeft:10}}
                                   onPress={()=>{
-                                      this.navigate2RuleSearch()
+                                      this.navigate2RuleAdd()
                         }}>
                     <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
                         <Icon name={'search'} size={25} color={'#d4237a'}/>
@@ -88,7 +114,7 @@ class Rule extends Component {
                 {/*关注车辆的添加（可平台外车辆）查询*/}
                 <TouchableOpacity style={{height:50,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:3,paddingLeft:10}}
                                   onPress={()=>{
-                                      this.navigate2RuleSearch()
+                                      this.navigate2RuleAddSearch()
                         }}>
                     <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
                         <Icon name={'search'} size={25} color={'#13227a'}/>

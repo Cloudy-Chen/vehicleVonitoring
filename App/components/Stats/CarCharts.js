@@ -27,6 +27,7 @@ import TiredChart from './TiredChart'
 import DistanceChart from './DistanceChart'
 import OilChart from './OilChart'
 import ToolBar from '../../utils/ToolBar'
+import LineChart from './LineChart'
 
 var {height, width} = Dimensions.get('window');
 
@@ -36,6 +37,18 @@ class CarCharts extends Component {
         const {navigator} = this.props;
         if (navigator) {
             navigator.pop();
+        }
+    }
+
+    navigate2LineChart() {
+        const { navigator } = this.props;
+        if (navigator) {
+            navigator.push({
+                name: 'LineChart',
+                component: LineChart,
+                params: {
+                }
+            })
         }
     }
 
@@ -108,12 +121,7 @@ class CarCharts extends Component {
         if (position < 0 || position > 1) return
     }
 
-
-    componentWillUnmount(){
-    }
-
     componentDidMount(){
-
     }
 
 }

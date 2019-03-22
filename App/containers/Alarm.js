@@ -44,11 +44,11 @@ class Alarm extends Component {
         return (
             <View style={{height:45,width:width,flexDirection:'row',justifyContent:'center',alignItems:'center',paddingHorizontal:10}}>
                 <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
-                    <Text style={{fontSize:16,color:'#888'}}>{rowData.carNo}</Text></View>
+                    <Text style={{fontSize:16,color:'#888'}}>{rowData.plateNum}</Text></View>
                 <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
-                    <Text style={{fontSize:16,color:'#888'}}>{rowData.type}</Text></View>
+                    <Text style={{fontSize:16,color:'#888'}}>{rowData.alarmContent}</Text></View>
                 <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
-                    <Text style={{fontSize:16,color:'#888'}}>{rowData.time}</Text></View>
+                    <Text style={{fontSize:16,color:'#888'}}>{rowData.updateTime}</Text></View>
                 <View style={{flex:1,padding:10,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
                     <TouchableOpacity
                         style={{backgroundColor:'#387ef5',paddingVertical:5,paddingHorizontal:15,borderRadius:5}}
@@ -112,7 +112,7 @@ class Alarm extends Component {
         return (
             <View style={{flex:1,backgroundColor:'transparent'}}>
 
-                <View style={{height:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
+                <View style={{height:Platform.OS=='ios'?78:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
                     <Text style={{color:'#fff',fontSize:20}}>实时报警</Text>
                 </View>
                 <View style={{flex:5,backgroundColor:'#fff'}}>

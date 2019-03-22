@@ -26,7 +26,7 @@ import ToolBar from '../../utils/ToolBar'
 
 var {height, width} = Dimensions.get('window');
 
-class RuleSearch extends Component {
+class RuleAddSearch extends Component {
 
     goBack(){
         const { navigator } = this.props;
@@ -95,15 +95,6 @@ class RuleSearch extends Component {
                          onPress={()=>{
                              this.goBack();
                          }}/>
-                    <SearchBar
-                        lightTheme
-                        onChangeText={
-                            //模糊查询
-                            (text)=>{
-                                this.searchByText(text)
-                            }
-                        }
-                        placeholder='搜索' />
                 <View style={{flex:5,backgroundColor:'#fff'}}>
                     <View style={{height:45,width:width,flexDirection:'row',justifyContent:'center',alignItems:'center',paddingHorizontal:10,borderBottomWidth:1,borderColor:'#888'}}>
                         <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
@@ -117,19 +108,6 @@ class RuleSearch extends Component {
                 </View>
             </View>
         );
-    }
-
-    searchByText(text){
-        var search_Rule = [];
-        var all_Rule = this.state.all_Rule;
-        all_Rule.map((rule,i)=>{
-            if(rule.carNo.indexOf(text)!=-1){
-                search_Rule.push(rule)
-            }
-        })
-
-        this.setState({search_Rule:search_Rule})
-
     }
 }
 
@@ -153,4 +131,4 @@ const mapStateToProps = (state, ownProps) => {
     return props
 }
 
-export default connect(mapStateToProps)(RuleSearch);
+export default connect(mapStateToProps)(RuleAddSearch);

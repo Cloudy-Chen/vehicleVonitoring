@@ -156,9 +156,11 @@ class ModifyMyInformation extends Component {
                                         dateTouchBody:{marginRight:0,height:25,borderWidth:0},
                                     }}
                                             mode="date"
+                                            data={this.state.perBirth}
                                             placeholder="选择"
                                             format="YYYY-MM-DD"
-                                            minDate={"1957-00-00"}
+                                            minDate="2019-03-01"
+                                            maxDate="2019-04-01"
                                             confirmBtnText="确认"
                                             cancelBtnText="取消"
                                             showIcon={true}
@@ -260,7 +262,7 @@ class ModifyMyInformation extends Component {
 var styles = StyleSheet.create({
 
     container: {
-        flex: 1,
+        flex: 1,backgroundColor:'#eee'
     },
     toolbar: {
         backgroundColor: '#eee',

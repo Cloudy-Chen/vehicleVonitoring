@@ -31,13 +31,14 @@ import {
     PAGE_PASSWORDFORGET,
 
 } from '../constants/PageStateConstants';
-import Map from './Map';
+import Map from './MapTest';
 import Charts from './Charts';
 import Login from './Login';
 import Alarm from './Alarm';
 import My from './My';
 import Rule from './Rule';
 import PlatformExchange from './PlatformExchange'
+import SocketTest from '../SocketTest'
 import {
     updateRootTab
 }  from '../actions/TabActions';
@@ -140,43 +141,45 @@ class App extends Component {
 
         setInterval(() => {
             if(this.props.auth==true) {
-                //成功登录后,每10秒查看报警信息
-                var alarms_haveRead = this.state.alarms_haveRead;
-                var alarms_notRead = this.state.alarms_notRead;
-                var alarms_get = this.getAlarmsInfo();
-
-                if (alarms_get != null) {
-                    alarms_get.map((alarm, i) => {
-                        var flag = 0;
-                        alarms_haveRead.map((alarm_haveRead, j) => {
-                            if (alarm.carId == alarm_haveRead.carId) flag = 1;
-                        })
-                        alarms_notRead.map((alarm_notRead, j) => {
-                            if (alarm.carId == alarm_notRead.carId) flag = 1;
-                        })
-                        if (flag == 0) alarms_notRead.push(alarm)
-                    })
-
-                    this.setState({alarms_notRead: alarms_notRead})
-                }
+                this.getAlarmsInfo();
             }
         }, 10000);
     }
 
     getAlarmsInfo(){
 
-            // Proxy.postes({
-            //     url: Config.server + '/func/web/getAllDriver',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: {}
-            // }).then((json) => {
-            //     return json.data;
-            // }).catch((e) => {
-            // })
+        //成功登录后,每10秒查看报警信息
+        var alarms_haveRead = this.state.alarms_haveRead;
+        var alarms_notRead = this.state.alarms_notRead;
+        var alarms_get = [];
 
-        return AlarmInfo;
+            Proxy.postes({
+                url: Config.server + '/func/web/getAllAlarmProcessInfo',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: {}
+            }).then((json) => {
+                alarms_get = json.data;
+
+                if (alarms_get != null) {
+                    alarms_get.map((alarm, i) => {
+                        var flag = 0;
+                        alarms_haveRead.map((alarm_haveRead, j) => {
+                            if (alarm.alarmId == alarm_haveRead.alarmId) flag = 1;
+                        })
+                        alarms_notRead.map((alarm_notRead, j) => {
+                            if (alarm.alarmId == alarm_notRead.alarmId) flag = 1;
+                        })
+                        if (flag == 0) alarms_notRead.push(alarm)
+                    })
+
+                    this.setState({alarms_notRead: alarms_notRead})
+                }
+
+            }).catch((e) => {
+                return null;
+            })
     }
 
 
