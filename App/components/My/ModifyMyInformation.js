@@ -45,13 +45,12 @@ class ModifyMyInformation extends Component {
             isRefreshing: false,
             fadeAnim: new Animated.Value(1),
 
-            perName:'陈海云',
-            perAge:23,
-            perGender:2,
-            perBirth:'1996-10-29',
-            perCop:'山东大学',
-            perAddress:'山东省济南市',
-            perPhone:'13305607453',
+            perName:this.props.personInfo.perName,
+            perGender:this.props.personInfo.genderCode,
+            perBirth:this.props.personInfo.birthday,
+            perCop:this.props.personInfo.companyName,
+            perAddress:this.props.personInfo.address,
+            perPhone:this.props.personInfo.mobilePhone,
 
             perGenderOption:['取消','男','女'],
         }
@@ -70,6 +69,8 @@ class ModifyMyInformation extends Component {
     }
 
     render() {
+
+        var personInfo = this.props.personInfo;
 
         var perGender = this.state.perGender;
         var sex = perGender==1?'男':'女';//男1女2
@@ -235,7 +236,7 @@ class ModifyMyInformation extends Component {
                                         placeholderTextColor='#888'
                                         style={{fontSize:14,color:'#222',justifyContent:'flex-end',textAlign:'right',flex:3,padding:0}}
                                         placeholder={
-                                            this.props.perAddress
+                                            personInfo.address
                                         }
                                         value={this.state.perAddress}
                                         onChangeText={
@@ -274,6 +275,7 @@ var styles = StyleSheet.create({
 const mapStateToProps = (state, ownProps) => {
 
     const props = {
+        personInfo:state.user.personInfo
     }
 
     return props

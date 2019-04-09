@@ -23,10 +23,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Modalbox from 'react-native-modalbox';
 import {SearchBar} from 'react-native-elements'
 import ToolBar from '../../utils/ToolBar'
+import Proxy from '../../proxy/Proxy'
+import Config from '../../../config';
 
 var {height, width} = Dimensions.get('window');
 
-class RuleSearch extends Component {
+class ViolationSearch extends Component {
 
     goBack(){
         const { navigator } = this.props;
@@ -42,19 +44,8 @@ class RuleSearch extends Component {
             isRefreshing: false,
             fadeAnim: new Animated.Value(1),
 
-            all_Rule:
-            [
-                {carId:1,carNo:'鲁NA7813',carAddress:'山东省济南市',carTime:'2018-03-08 12:58:30'},
-                {carId:2,carNo:'鲁NA3356',carAddress:'安徽省合肥市',carTime:'2018-03-09 14:55:55'},
-                {carId:3,carNo:'鲁NA1530',carAddress:'安徽省合肥市',carTime:'2018-03-10 08:23:00'},
-                {carId:4,carNo:'鲁NA2336',carAddress:'山东省威海市',carTime:'2018-03-11 23:00:01'}
-            ],
-            search_Rule:[
-                {carId:1,carNo:'鲁NA7813',carAddress:'山东省济南市',carTime:'2018-03-08 12:58:30'},
-                {carId:2,carNo:'鲁NA3356',carAddress:'安徽省合肥市',carTime:'2018-03-09 14:55:55'},
-                {carId:3,carNo:'鲁NA1530',carAddress:'安徽省合肥市',carTime:'2018-03-10 08:23:00'},
-                {carId:4,carNo:'鲁NA2336',carAddress:'山东省威海市',carTime:'2018-03-11 23:00:01'}
-            ],
+            allViolationInfo: [],
+            searchViolationInfo:[],
         }
     }
 
@@ -63,26 +54,28 @@ class RuleSearch extends Component {
         return (
             <View style={{height:45,width:width,flexDirection:'row',justifyContent:'center',alignItems:'center',paddingHorizontal:10}}>
                 <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:3}}>
-                    <Text style={{fontSize:16,color:'#888'}}>{rowData.carNo}</Text></View>
-                <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:0}}>
-                    <Text style={{fontSize:14,color:'#888'}} >{rowData.carTime}</Text></View>
+                    <Text style={{fontSize:14,color:'#888'}}>{rowData.plateNum}</Text></View>
                 <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:3}}>
-                    <Text style={{fontSize:16,color:'#888'}}>{rowData.carAddress}</Text></View>
+                    <Text style={{fontSize:14,color:'#888'}}>{rowData.violationContent}</Text></View>
+                <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:0}}>
+                    <Text style={{fontSize:14,color:'#888'}} >{rowData.violationTime}</Text></View>
+                <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:3}}>
+                    <Text style={{fontSize:14,color:'#888'}}>{rowData.location}</Text></View>
             </View>
         );
     }
 
     render() {
 
-        var rule=this.state.search_Rule;
-        var ruleList = null;
+        var searchViolationInfo=this.state.searchViolationInfo;
+        var searchViolationInfoList = null;
 
-        if(rule!=null && rule!=undefined && rule.length>0) {
+        if(searchViolationInfo!=null && searchViolationInfo!=undefined && searchViolationInfo.length>0) {
             var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-            ruleList = (
+            searchViolationInfoList = (
                 <ListView
                     automaticallyAdjustContentInsets={false}
-                    dataSource={ds.cloneWithRows(rule)}
+                    dataSource={ds.cloneWithRows(searchViolationInfo)}
                     renderRow={this.renderRow.bind(this)}
                 />
             );
@@ -107,29 +100,47 @@ class RuleSearch extends Component {
                 <View style={{flex:5,backgroundColor:'#fff'}}>
                     <View style={{height:45,width:width,flexDirection:'row',justifyContent:'center',alignItems:'center',paddingHorizontal:10,borderBottomWidth:1,borderColor:'#888'}}>
                         <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
-                            <Text style={{fontSize:16,color:'#888'}}>车牌号</Text></View>
+                            <Text style={{fontSize:14,color:'#333'}}>车牌号</Text></View>
                         <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
-                            <Text style={{fontSize:16,color:'#888'}}>违章时间</Text></View>
+                            <Text style={{fontSize:14,color:'#333'}}>违章内容</Text></View>
                         <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
-                            <Text style={{fontSize:16,color:'#888'}}>违章地址</Text></View>
+                            <Text style={{fontSize:14,color:'#333'}}>违章时间</Text></View>
+                        <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:10}}>
+                            <Text style={{fontSize:14,color:'#333'}}>违章地址</Text></View>
                     </View>
-                    {ruleList}
+                    {searchViolationInfoList}
                 </View>
             </View>
         );
     }
 
     searchByText(text){
-        var search_Rule = [];
-        var all_Rule = this.state.all_Rule;
-        all_Rule.map((rule,i)=>{
-            if(rule.carNo.indexOf(text)!=-1){
-                search_Rule.push(rule)
+        var searchViolationInfo = [];
+        var allViolationInfo = this.state.allViolationInfo;
+        allViolationInfo.map((violation,i)=>{
+            if(violation.plateNum.indexOf(text)!=-1){
+                searchViolationInfo.push(violation)
             }
         })
+        this.setState({searchViolationInfo:searchViolationInfo})
+    }
 
-        this.setState({search_Rule:search_Rule})
+    componentDidMount(){
 
+        Proxy.postes({
+            url: Config.server + '/func/web/getAllViolationInfo',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: {
+            }
+        }).then((json)=>{
+            if(json.re==1) {
+                var violationInfo = json.data
+                this.setState({searchViolationInfo:violationInfo,allViolationInfo:violationInfo})
+            }
+        }).catch((e)=>{
+        })
     }
 }
 
@@ -153,4 +164,4 @@ const mapStateToProps = (state, ownProps) => {
     return props
 }
 
-export default connect(mapStateToProps)(RuleSearch);
+export default connect(mapStateToProps)(ViolationSearch);

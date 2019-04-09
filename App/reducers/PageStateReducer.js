@@ -9,7 +9,7 @@ const initialState = {
     navigators:{
         Stats:null,
         Alarm:null,
-        Rule:null,
+        Violation:null,
         My:null,
     }
 };

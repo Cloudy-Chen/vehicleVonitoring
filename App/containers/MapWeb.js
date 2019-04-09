@@ -37,8 +37,7 @@ import CapturePicture from '../components/Map/CapturePicture'
 
 var {height, width} = Dimensions.get('window');
 
-
-class Map extends Component {
+class MapWeb extends Component {
 
     goBack(){
         const { navigator } = this.props;
@@ -59,7 +58,7 @@ class Map extends Component {
             center:
                 {latitude: 0,longitude: 0},
             zoom:10,
-            selectedLeafs:[],
+            selectedCars:[], //web数据获得
 
             //汽车信息
             carInfoVisible:false,
@@ -73,6 +72,7 @@ class Map extends Component {
 
             //侧滑树状图
             isOpen:false,
+            treeselectData:[],//树状图（数据库）获得
 
             //驾驶信息
             driverSpeed:0,
@@ -85,9 +85,14 @@ class Map extends Component {
         }
         this.handleMessage = this.handleMessage.bind(this);
         this.sendMessage = this.sendMessage.bind(this)
+        var timer = null;
     }
 
     navigate2YourEyes() {
+        if(this.timer){
+            clearInterval(this.timer);
+            this.timer==null;
+        }
         const { navigator } = this.props;
         if (navigator) {
             navigator.push({
@@ -100,6 +105,10 @@ class Map extends Component {
     }
 
     navigate2CarCharts() {
+        if(this.timer){
+            clearInterval(this.timer);
+            this.timer==null;
+        }
         const { navigator } = this.props;
         if (navigator) {
             navigator.push({
@@ -112,6 +121,10 @@ class Map extends Component {
     }
 
     navigate2CapturePicture() {
+        if(this.timer){
+            clearInterval(this.timer);
+            this.timer==null;
+        }
         const { navigator } = this.props;
         if (navigator) {
             navigator.push({
@@ -125,20 +138,23 @@ class Map extends Component {
 
     handleMessage(e) {
         //this.setState({ webViewData: e.nativeEvent.data });
-        var title = e.nativeEvent.data;
+
+        var msgJson = e.nativeEvent.data;
+        var msg = JSON.parse(msgJson)
+        var plateNum = msg.plateNum
         var cars = this.state.selectedLeafs;
         var car_click = null;
 
         cars.map((car)=>{
-            if(car.plateNum==title)car_click = car;
+            if(car.plateNum==plateNum)car_click = car;
         })
 
         car_click==null?
-            this.setState({isOpen:false,selectedVideo:-1,driverSpeed:0,driverName:'获取失败',driverLastTime:'获取失败',
+            this.setState({selectedVideo:-1,driverSpeed:0,driverName:'获取失败',driverLastTime:'获取失败',
                 driverCompany:'获取失败',driverWeather:'获取失败',driverAddress:'获取失败',driverFlag:0})
             :
-            this.setState({isOpen:false,selectedVideo:-1,driverSpeed:car_click.driverSpeed,driverName:car_click.driverName,driverLastTime:car_click.driverLastTime,
-                driverCompany:car_click.driverCompany,driverWeather:car_click.driverWeather,driverAddress:car_click.driverAddress,driverFlag:car_click.driverFlag})
+            this.setState({selectedVideo:-1,driverSpeed:car_click.driverSpeed,driverName:car_click.driverName,driverLastTime:car_click.driverLastTime,
+                driverCompany:car_click.driverCompany,driverWeather:msg.weather,driverAddress:msg.address,driverFlag:car_click.driverFlag})
 
         this.refs.modal1.open()
 
@@ -147,6 +163,66 @@ class Map extends Component {
     sendMessage(selectedLeafs) {
         var json = JSON.stringify(selectedLeafs)
         this.carWeb.postMessage(json);
+    }
+
+    getSelectedCarsFromWeb(selectedCars){
+        if(selectedCars!=null && selectedCars!=undefined && selectedCars.length!=0) {
+            //点击访问一次
+            this.getSelectedCars(selectedCars);
+            //30秒访问一次
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer == null;
+            }
+            this.timer = setInterval(
+                () => {
+                    this.getSelectedCars(selectedCars);
+                },
+                5000,
+            );
+        }
+    }
+
+    getSelectedCars(selectedCars){
+        var mobilePhone = selectedCars[0].phoneNum;
+        if(selectedCars!=null && selectedCars!=undefined && selectedCars!=""){
+            Proxy.postes({
+                url: Config.server + '/func/web/getCarsPositionFromNet',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: {
+                    mobilePhone:mobilePhone
+                }
+            }).then((json) => {
+                var point = json.data;
+                //目前只收到一个数据
+                var car = {
+                    id:'A001',
+                    name:'鲁NC7316',
+                    plateNum: '鲁NC7316',
+                    sortNo:"A011",
+                    parentId:"A01",
+                    latitude: point.latitude,
+                    longitude: point.longitude,
+                    rotate:90,
+                    driverFlag:1,
+                    driverSpeed: point.speed,
+                    driverName: '陈海云',
+                    driverLastTime: point.time,
+                    driverCompany: '山东大学',
+                    driverWeather: '晴天',
+                    driverAddress: '山东省济南市历城区',
+
+                }
+                var selectedLeafs = [];
+                selectedLeafs.push(car);
+                this.setState({selectedLeafs: selectedLeafs})
+                this.sendMessage(selectedLeafs)
+            }).catch((e) => {
+                return null;
+            })
+        }
     }
 
     render()
@@ -297,7 +373,7 @@ class Map extends Component {
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
                     <Text style={{color:'#000',flex:1}}>天气状况</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverWeather}</Text></View>
                 <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#aaa'}}>
-                    <Text style={{color:'#000',flex:1}}>地址</Text><Text style={{color:'#888',flex:5,textAlign:'right'}}>{this.state.driverAddress}</Text></View>
+                    <Text style={{color:'#000',flex:1}}>地址</Text><Text style={{color:'#888',flex:3,textAlign:'right'}}>{this.state.driverAddress}</Text></View>
                 <View style={{flex:2,flexDirection:'row',justifyContent:'center',alignItems:'center',marginTop:10}}>
                     <TouchableOpacity style={{flex:1,flexDirection:'column',justifyContent:'center',alignItems:'center'}}
                                       onPress={()=>{
@@ -360,9 +436,10 @@ class Map extends Component {
             </View>;
 
         const menu =
-            <View style={{backgroundColor:'#fff',flex:1,paddingTop:10}}>
+            this.state.treeselectData!=null&&this.state.treeselectData!=undefined&&this.state.treeselectData.length>0?
+            <View style={{backgroundColor:'#fff',flex:1,paddingTop:Platform.OS=='ios'?50:10}}>
                 <TreeSelect
-                    data={treeselectData}
+                    data={this.state.treeselectData}
                     openIds={['A01']}
                     isShowTreeId={false}
                     itemStyle={{
@@ -374,12 +451,15 @@ class Map extends Component {
                     treeNodeStyle={{
                     }}
                     onPress={(selectedLeafs)=>{
-                        this.setState({isOpen:false,selectedLeafs:selectedLeafs})
-                        this.sendMessage(selectedLeafs)
+                        this.setState({isOpen:false})
+                        setTimeout(() => {
+                                this.getSelectedCarsFromWeb(selectedLeafs)
+                            }, 1000);
                     }
                     }
                 />
-            </View>;
+            </View>:
+                <View style={{backgroundColor:'#fff',flex:1,paddingTop:10}}/>;
 
         return (
             <SideMenu
@@ -457,22 +537,31 @@ class Map extends Component {
 
     componentDidMount(){
 
-        // Proxy.postes({
-        //     url: Config.server + '/func/web/getCarsPositionFromNet',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: {
-        //     }
-        // }).then((json)=>{
-        //     alert(json.data)
-        // }).catch((e)=>{
-        //     alert(e)
-        // })
+        Proxy.postes({
+            url: Config.server + '/func/web/getAllVehicleFormList',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: {
+            }
+        }).then((json)=>{
+            if(json.re==1) {
+                var companyList = json.data;
+                this.setState({treeselectData: companyList})
+            }
+            else{
+                this.setState({treeselectData:[]})
+            }
+        }).catch((e)=>{
+        })
+    }
 
+    componentWillUnmount(){
+        this.timer && clearInterval(this.timer);
     }
 
 }
+
 
 const patchPostMessageFunction = function() {
     var originalPostMessage = window.postMessage;
@@ -499,4 +588,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default  Map
+export default  MapWeb

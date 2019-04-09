@@ -20,13 +20,12 @@ import {
 } from 'react-native';
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import RuleSearch from '../components/Rule/RuleSearch'
-import RuleAdd from '../components/Rule/RuleAdd'
-import RuleAddSearch from '../components/Rule/RuleAddSearch'
+import ViolationSearch from '../components/Violation/ViolationSearch'
+import MonitorViolationSearch from '../components/Violation/MonitorViolationSearch'
 
 var {height, width} = Dimensions.get('window');
 
-class Rule extends Component {
+class Violation extends Component {
 
     constructor(props) {
         super(props);
@@ -37,36 +36,24 @@ class Rule extends Component {
         }
     }
 
-    navigate2RuleSearch() {
+    navigate2ViolationSearch() {
         const { navigator } = this.props;
         if (navigator) {
             navigator.push({
-                name: 'RuleSearch',
-                component: RuleSearch,
+                name: 'ViolationSearch',
+                component: ViolationSearch,
                 params: {
                 }
             })
         }
     }
 
-    navigate2RuleAdd() {
+    navigate2MonitorViolationSearch() {
         const { navigator } = this.props;
         if (navigator) {
             navigator.push({
-                name: 'RuleAdd',
-                component: RuleAdd,
-                params: {
-                }
-            })
-        }
-    }
-
-    navigate2RuleAddSearch() {
-        const { navigator } = this.props;
-        if (navigator) {
-            navigator.push({
-                name: 'RuleAddSearch',
-                component: RuleAddSearch,
+                name: 'MonitorViolationSearch',
+                component: MonitorViolationSearch,
                 params: {
                 }
             })
@@ -78,16 +65,16 @@ class Rule extends Component {
         return (
             <View style={{flex:1,backgroundColor:'#eee'}}>
                 <View style={{height:Platform.OS=='ios'?78:48,width:width,backgroundColor:'#387ef5',justifyContent:'center',alignItems:'center'}}>
-                    <Text style={{color:'#fff',fontSize:20}}>交通违章（交警提供）</Text>
+                    <Text style={{color:'#fff',fontSize:20}}>交通违章</Text>
                 </View>
 
                 {/*九通平台车辆违章查询*/}
                 <TouchableOpacity style={{height:50,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:3,paddingLeft:10}}
                                   onPress={()=>{
-                                      this.navigate2RuleSearch()
+                                      this.navigate2ViolationSearch()
                         }}>
                     <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
-                        <Icon name={'search'} size={25} color={'#36ab60'}/>
+                        <Icon name={'search'} size={25} color={'#387ef5'}/>
                     </View>
                     <View style={{flex:11,backgroundColor:'#fff',justifyContent:'center',marginLeft:10,paddingLeft:20}}>
                         <Text>九通平台车辆违章查询</Text>
@@ -96,31 +83,16 @@ class Rule extends Component {
                         <Icon name={'angle-right'} size={25} color={'#888'}/>
                     </View>
                 </TouchableOpacity>
-                {/*关注车辆的添加（可平台外车辆）*/}
+                {/*关注车辆的添加查询*/}
                 <TouchableOpacity style={{height:50,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:3,paddingLeft:10}}
                                   onPress={()=>{
-                                      this.navigate2RuleAdd()
+                                      this.navigate2MonitorViolationSearch()
                         }}>
                     <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
-                        <Icon name={'search'} size={25} color={'#d4237a'}/>
+                        <Icon name={'search-plus'} size={25} color={'#387ef5'}/>
                     </View>
                     <View style={{flex:11,backgroundColor:'#fff',justifyContent:'center',marginLeft:10,paddingLeft:20}}>
-                        <Text>关注车辆的添加（可平台外车辆）</Text>
-                    </View>
-                    <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
-                        <Icon name={'angle-right'} size={25} color={'#888'}/>
-                    </View>
-                </TouchableOpacity>
-                {/*关注车辆的添加（可平台外车辆）查询*/}
-                <TouchableOpacity style={{height:50,backgroundColor:'#fff',flexDirection:'row',padding:2,marginBottom:3,paddingLeft:10}}
-                                  onPress={()=>{
-                                      this.navigate2RuleAddSearch()
-                        }}>
-                    <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
-                        <Icon name={'search'} size={25} color={'#13227a'}/>
-                    </View>
-                    <View style={{flex:11,backgroundColor:'#fff',justifyContent:'center',marginLeft:10,paddingLeft:20}}>
-                        <Text>关注车辆的添加（可平台外车辆）查询</Text>
+                        <Text>关注车辆的添加查询</Text>
                     </View>
                     <View style={{flex:1,flexDirection:'row',justifyContent:'center',alignItems: 'center'}}>
                         <Icon name={'angle-right'} size={25} color={'#888'}/>
@@ -152,4 +124,4 @@ const mapStateToProps = (state, ownProps) => {
     return props
 }
 
-export default connect(mapStateToProps)(Rule);
+export default connect(mapStateToProps)(Violation);

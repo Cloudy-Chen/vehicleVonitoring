@@ -20,14 +20,13 @@ let user = (state = initialState, action) => {
     switch (action.type) {
 
         case ACCESS_TOKEN_ACK:
-
             return Object.assign({}, state, {
                 accessToken: action.accessToken,
                 validate: action.validate,
                 auth: action.auth
             })
         case UPDATE_PERSON_INFO:
-            var { data } = action.payload;
+            var  data  = action.payload;
             return Object.assign({}, state, {
                 personInfo: data
             })

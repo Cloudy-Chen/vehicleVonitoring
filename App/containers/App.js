@@ -31,12 +31,12 @@ import {
     PAGE_PASSWORDFORGET,
 
 } from '../constants/PageStateConstants';
-import Map from './MapTest';
+import Map from './MapWeb';
 import Charts from './Charts';
 import Login from './Login';
 import Alarm from './Alarm';
 import My from './My';
-import Rule from './Rule';
+import Violation from './Violation';
 import PlatformExchange from './PlatformExchange'
 import SocketTest from '../SocketTest'
 import {
@@ -73,7 +73,7 @@ class App extends Component {
                 component = Map;
                 break;
             case '交通违章':
-                component = Rule;
+                component = Violation;
                 break;
             case '个人中心':
                 component = My;
@@ -141,7 +141,7 @@ class App extends Component {
 
         setInterval(() => {
             if(this.props.auth==true) {
-                this.getAlarmsInfo();
+                //this.getAlarmsInfo();
             }
         }, 10000);
     }
@@ -247,6 +247,21 @@ class App extends Component {
     }
 }
 
+const patchPostMessageFunction = function() {
+    var originalPostMessage = window.postMessage;
+
+    var patchedPostMessage = function(message, targetOrigin, transfer) {
+        originalPostMessage(message, targetOrigin, transfer);
+    };
+
+    patchedPostMessage.toString = function() {
+        return String(Object.hasOwnProperty).replace('hasOwnProperty', 'postMessage');
+    };
+
+    window.postMessage = patchedPostMessage;
+};
+
+const patchPostMessageJsCode = '(' + String(patchPostMessageFunction) + ')();';
 
 const styles = StyleSheet.create({
     container: {

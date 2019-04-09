@@ -39,7 +39,7 @@ var {height, width} = Dimensions.get('window');
 
 var ws = new WebSocket('ws://202.194.14.71:10001/LocationMsg');
 
-class MapTest extends Component {
+class MapSocket extends Component {
 
     goBack(){
         const { navigator } = this.props;
@@ -74,6 +74,7 @@ class MapTest extends Component {
 
             //侧滑树状图
             isOpen:false,
+            treeselectData:[],
 
             //驾驶信息
             driverSpeed:0,
@@ -151,6 +152,23 @@ class MapTest extends Component {
     sendMessage(selectedLeafs) {
         var json = JSON.stringify(selectedLeafs)
         this.carWeb.postMessage(json);
+    }
+
+    getSelectedCarsFromSocket(selectedCars){
+        this.setState({isOpen:false})
+        if(ws==null) return;
+        if(selectedCars==null || selectedCars==undefined || selectedCars.length==0)return;
+
+        if(ws.readyState === WebSocket.OPEN) {
+            for(var i=0;i<selectedCars.length;i++){
+                var car = selectedCars[i];
+                var msg = '0x8201'+car.phoneNum;
+                ws.send(msg);
+            }
+            ws.send(message);
+        } else {
+            alert('连接尚未开启!');
+        }
     }
 
     render()
@@ -404,9 +422,10 @@ class MapTest extends Component {
             </View>;
 
         const menu =
-            <View style={{backgroundColor:'#fff',flex:1,paddingTop:10}}>
+            this.state.treeselectData!=null&&this.state.treeselectData!=undefined&&this.state.treeselectData.length>0?
+            <View style={{backgroundColor:'#fff',flex:1,paddingTop:Platform.OS=='ios'?50:10}}>
                 <TreeSelect
-                    data={treeselectData}
+                    data={this.state.treeselectData}
                     openIds={['A01']}
                     isShowTreeId={false}
                     itemStyle={{
@@ -418,14 +437,12 @@ class MapTest extends Component {
                     treeNodeStyle={{
                     }}
                     onPress={(selectedLeafs)=>{
-                        //this.setState({isOpen:false,selectedLeafs:selectedLeafs})
-                        //this.sendMessage(selectedLeafs)
-                        this.setState({isOpen:false})
-                        //ws = new WebSocket('ws://202.194.14.71:10001/LocationMsg');
+                        this.getSelectedCarsFromSocket(selectedLeafs)
                     }
                     }
                 />
-            </View>;
+            </View>:
+                <View style={{backgroundColor:'#fff',flex:1,paddingTop:10}}/>;
 
         return (
             <SideMenu
@@ -503,20 +520,25 @@ class MapTest extends Component {
 
     componentDidMount(){
 
-        // Proxy.postes({
-        //     url: Config.server + '/func/web/getAllAlarmProcessInfo',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: {
-        //     }
-        // }).then((json)=>{
-        //
-        // }).catch((e)=>{
-        // })
-
+        Proxy.postes({
+            url: Config.server + '/func/web/getAllVehicleFormList',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: {
+            }
+        }).then((json)=>{
+            if(json.re==1) {
+                var companyList = json.data;
+                this.setState({treeselectData: companyList})
+                //this.setState({treeselectData:treeselectData})
+            }
+            else{
+                this.setState({treeselectData:[]})
+            }
+        }).catch((e)=>{
+        })
     }
-
 }
 
 const patchPostMessageFunction = function() {
@@ -544,4 +566,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default  MapTest
+export default  MapSocket

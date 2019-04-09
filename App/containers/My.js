@@ -78,6 +78,8 @@ class My extends Component {
 
     render() {
 
+        var personInfo = this.props.personInfo;
+
         return (
             <View style={{flex:1,backgroundColor:'#eee'}}>
             <ScrollView style={{flex:1}}>
@@ -94,8 +96,8 @@ class My extends Component {
                         <Image resizeMode="cover" source={require('../../img/person.png')} style={{height:50,width:50}}/>
                     </View>
                     <View style={{flex:5,backgroundColor:'#fff',justifyContent:'center',marginLeft:10,paddingLeft:20,flexDirection:'column'}}>
-                        <Text>姓名：陈海云</Text>
-                        <Text>电话：13305607453</Text>
+                        <Text>姓名：{personInfo.perName}</Text>
+                        <Text>电话：{personInfo.mobilePhone}</Text>
                     </View>
                     <View style={{flex:1,backgroundColor:'#fff',justifyContent:'center',alignItems:'flex-end',paddingRight:10}}>
                         <Icon name={'angle-right'} size={25}/>
@@ -248,6 +250,7 @@ var styles = StyleSheet.create({
 const mapStateToProps = (state, ownProps) => {
 
     const props = {
+        personInfo: state.user.personInfo,
     }
 
     return props

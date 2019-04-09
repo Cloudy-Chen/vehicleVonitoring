@@ -21,7 +21,6 @@ export let doLogin = (username, password) => {
             Proxy.postes({
                 url: Config.server + '/func/auth/webLogin',
                 headers: {
-                    'Authorization': "Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW",
                     'Content-Type': 'application/json'
                 },
                 body: {
@@ -38,9 +37,21 @@ export let doLogin = (username, password) => {
                     dispatch(getAccessToken(accessToken));
                     PreferenceStore.put('username', username);
                     PreferenceStore.put('password', password);
-                    resolve({re:1})
-                }
 
+                    Proxy.postes({
+                        url: Config.server + '/func/web/getUserInfo',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: {}
+                    }).then((json)=>{
+                        var person = json.data;
+                        dispatch(updatePersonInfo(person));
+                        resolve({re:1});
+                    }).catch((e)=>{
+                        reject(e)
+                    })
+                }
             }).catch((e)=>{
                 reject(e)
             })
